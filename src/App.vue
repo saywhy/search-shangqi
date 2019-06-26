@@ -1,7 +1,6 @@
 <template>
     <div id="app">
         <!-- <img src="./assets/logo.png"> -->
-        sdsdas
         <router-view/>
     </div>
 </template>
@@ -14,8 +13,8 @@ export default {
 
 <style>
 #app {
-  width: 1920px;
-  height: 1080px;
+  width: 100%;
+  height: 100%;
   font-family: "Avenir", Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -31,6 +30,7 @@ export default {
 * {
   margin: 0;
   padding: 0;
+  box-sizing: border-box;
 }
 body,
 html {

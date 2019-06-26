@@ -10,6 +10,8 @@ import ElementUI from "element-ui";
 import "element-ui/lib/theme-chalk/index.css";
 import "common/family/font.css";
 import "common/family/pingfang.css";
+import "swiper/dist/css/swiper.min.css";
+// import { dateFilter } from "common/js/dateFilter.js"; // 引入我们刚刚创建的文件
 Vue.config.productionTip = false;
 // axios.defaults.baseURL = "/api";
 // axios.defaults.headers.post["Content-Type"] = "application/json";
