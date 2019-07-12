@@ -7,8 +7,8 @@
 
 <script>
 export default {
-    name: 'App'
-}
+  name: "App"
+};
 </script>
 
 <style>
@@ -20,6 +20,7 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #fff;
+  background: #f8f8f8;
   padding: 0;
   margin: 0;
   top: 0;
@@ -40,6 +41,7 @@ html {
   right: 0;
   height: 100%;
   width: 100%;
+  background: #f8f8f8;
   margin: 0;
   padding: 0;
   overflow: auto;

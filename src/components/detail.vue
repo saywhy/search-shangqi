@@ -113,6 +113,7 @@
                 </el-tabs>
             </div>
         </div>
+        <el-button :plain="true" @click="open4" v-if="false">错误</el-button>
     </div>
 </template>
 <style  lang="less">
@@ -134,7 +135,7 @@
       height: 86px;
       width: 142px;
       img {
-        height: 48px;
+        height: 60px;
         width: 142px;
         position: absolute;
         top: 50%;
@@ -315,286 +316,313 @@
 </style>
 <script>
 export default {
-    name: 'detail',
-    data() {
-        return {
-            detail_search: '',
-            activeName: 'first',
-            res_detail: {},
-            whois_info: [],
+  name: "detail",
+  data() {
+    return {
+      detail_search: "",
+      activeName: "first",
+      res_detail: {},
+      whois_info: []
+    };
+  },
+  created() {
+    var _this = this;
+    document.onkeydown = function(e) {
+      // 兼容FF和IE和Opera
+      var theEvent = e || window.event;
+      var code = theEvent.keyCode || theEvent.which || theEvent.charCode;
+      if (code == 13) {
+        //回车执行查询
+        _this.detail_search_btn();
+      }
+    };
+  },
+  mounted() {
+    console.log(JSON.parse(this.$route.query.shopid));
+    if (this.$route.query.shopid) {
+      if (JSON.parse(this.$route.query.shopid).hoohoolab_ip_whois) {
+        for (var k in JSON.parse(this.$route.query.shopid).hoohoolab_ip_whois) {
+          var obj = {};
+          if (
+            JSON.parse(this.$route.query.shopid).sources[0].indexOf(
+              "IPReputation"
+            ) != -1
+          ) {
+            switch (k) {
+              //   IP Reputation
+              case "net_range":
+                obj.name = "网络地址范围";
+                break;
+              case "net_name":
+                obj.name = "网络名称";
+                break;
+              case "descr":
+                obj.name = "网络描述";
+                break;
+              case "created":
+                obj.name = "网络注册时间";
+                break;
+              case "updated":
+                obj.name = "网络更新时间";
+                break;
+              case "country":
+                obj.name = "网络注册的国家";
+                break;
+              case "contact_owner_name":
+                obj.name = "网络所有者名称";
+                break;
+              case "contact_owner_code":
+                obj.name = "网络所有者编码";
+                break;
+              case "contact_owner_country":
+                obj.name = "网络所有者国家";
+                break;
+              case "contact_owner_country":
+                obj.name = "网络所有者国家";
+                break;
+              case "contact_owner_city":
+                obj.name = "网络所有者城市";
+                break;
+              case "contact_owner_email":
+                obj.name = "网络所有者邮箱";
+                break;
+              case "contact_abuse_name":
+                obj.name = "滥用报告接口人";
+                break;
+              case "contact_abuse_email":
+                obj.name = "滥用报告邮箱";
+                break;
+              case "asn":
+                obj.name = "自主系统号（ASN）";
+                break;
+              default:
+                obj.name = k;
+                break;
+            }
+          } else {
+            switch (k) {
+              // Malicious URL whois
+              // Phishing URL
+              case "domain":
+                obj.name = "域名";
+                break;
+              case "created":
+                obj.name = "域名注册时间";
+                break;
+              case "updated":
+                obj.name = "域名更新时间";
+                break;
+              case "expires":
+                obj.name = "域名过期时间";
+                break;
+              case "name":
+                obj.name = "注册人名称";
+                break;
+              case "org":
+                obj.name = "注册人组织";
+                break;
+              case "country":
+                obj.name = "注册人国家";
+                break;
+              case "city":
+                obj.name = "注册人城市";
+                break;
+              case "email":
+                obj.name = "注册人邮箱";
+                break;
+              case "email":
+                obj.name = "注册人邮箱";
+                break;
+              case "registrar_name":
+                obj.name = "注册机构名称";
+                break;
+              case "registrar_email":
+                obj.name = "注册机构邮箱";
+                break;
+              case "NS":
+                obj.name = "域名服务器";
+                break;
+              case "NS_ips":
+                obj.name = "域名服务器IP";
+                break;
+              case "MX":
+                obj.name = "邮件服务器";
+                break;
+              case "MX_ips":
+                obj.name = "邮件服务器IP";
+                break;
+              default:
+                obj.name = k;
+                break;
+            }
+          }
+          obj.value = JSON.parse(this.$route.query.shopid).hoohoolab_ip_whois[
+            k
+          ];
+          this.whois_info.push(obj);
         }
+      }
+      this.res_detail = JSON.parse(this.$route.query.shopid);
+    }
+  },
+  methods: {
+    handleClick(tab, event) {
+      console.log(tab, event);
+      console.log(this.activeName);
     },
-    mounted() {
-        console.log(JSON.parse(this.$route.query.shopid));
-        if (this.$route.query.shopid) {
-            if (JSON.parse(this.$route.query.shopid).hoohoolab_ip_whois) {
-                for (var k in JSON.parse(this.$route.query.shopid).hoohoolab_ip_whois) {
+    open4() {
+      this.$message.error("没有搜索到信誉情报详情");
+    },
+    detail_search_btn() {
+      this.activeName = "first";
+      if (this.detail_search == "") {
+      } else {
+        // this.$axios.get('https://47.105.196.251/site/reputation', {
+        this.$axios
+          .get("/site/reputation", {
+            params: {
+              indicator: this.detail_search
+              // indicator: '185.234.217.139'
+            }
+          })
+          .then(response => {
+            this.whois_info = [];
+            this.res_detail = {};
+            if (response.data.status == "success") {
+              if (response.data.data.result == null) {
+                this.open4();
+              } else {
+                if (response.data.data.result.hoohoolab_ip_whois) {
+                  for (var k in response.data.data.result.hoohoolab_ip_whois) {
                     var obj = {};
                     if (
-                        JSON.parse(this.$route.query.shopid).sources[0].indexOf("IPReputation") != -1
+                      response.data.data.result.sources[0].indexOf(
+                        "IPReputation"
+                      ) != -1
                     ) {
-                        switch (k) {
-                            //   IP Reputation
-                            case "net_range":
-                                obj.name = "网络地址范围";
-                                break;
-                            case "net_name":
-                                obj.name = "网络名称";
-                                break;
-                            case "descr":
-                                obj.name = "网络描述";
-                                break;
-                            case "created":
-                                obj.name = "网络注册时间";
-                                break;
-                            case "updated":
-                                obj.name = "网络更新时间";
-                                break;
-                            case "country":
-                                obj.name = "网络注册的国家";
-                                break;
-                            case "contact_owner_name":
-                                obj.name = "网络所有者名称";
-                                break;
-                            case "contact_owner_code":
-                                obj.name = "网络所有者编码";
-                                break;
-                            case "contact_owner_country":
-                                obj.name = "网络所有者国家";
-                                break;
-                            case "contact_owner_country":
-                                obj.name = "网络所有者国家";
-                                break;
-                            case "contact_owner_city":
-                                obj.name = "网络所有者城市";
-                                break;
-                            case "contact_owner_email":
-                                obj.name = "网络所有者邮箱";
-                                break;
-                            case "contact_abuse_name":
-                                obj.name = "滥用报告接口人";
-                                break;
-                            case "contact_abuse_email":
-                                obj.name = "滥用报告邮箱";
-                                break;
-                            case "asn":
-                                obj.name = "自主系统号（ASN）";
-                                break;
-                            default:
-                                obj.name = k;
-                                break;
-                        }
+                      switch (k) {
+                        //   IP Reputation
+                        case "net_range":
+                          obj.name = "网络地址范围";
+                          break;
+                        case "net_name":
+                          obj.name = "网络名称";
+                          break;
+                        case "descr":
+                          obj.name = "网络描述";
+                          break;
+                        case "created":
+                          obj.name = "网络注册时间";
+                          break;
+                        case "updated":
+                          obj.name = "网络更新时间";
+                          break;
+                        case "country":
+                          obj.name = "网络注册的国家";
+                          break;
+                        case "contact_owner_name":
+                          obj.name = "网络所有者名称";
+                          break;
+                        case "contact_owner_code":
+                          obj.name = "网络所有者编码";
+                          break;
+                        case "contact_owner_country":
+                          obj.name = "网络所有者国家";
+                          break;
+                        case "contact_owner_country":
+                          obj.name = "网络所有者国家";
+                          break;
+                        case "contact_owner_city":
+                          obj.name = "网络所有者城市";
+                          break;
+                        case "contact_owner_email":
+                          obj.name = "网络所有者邮箱";
+                          break;
+                        case "contact_abuse_name":
+                          obj.name = "滥用报告接口人";
+                          break;
+                        case "contact_abuse_email":
+                          obj.name = "滥用报告邮箱";
+                          break;
+                        case "asn":
+                          obj.name = "自主系统号（ASN）";
+                          break;
+                        default:
+                          obj.name = k;
+                          break;
+                      }
                     } else {
-                        switch (k) {
-                            // Malicious URL whois
-                            // Phishing URL
-                            case "domain":
-                                obj.name = "域名";
-                                break;
-                            case "created":
-                                obj.name = "域名注册时间";
-                                break;
-                            case "updated":
-                                obj.name = "域名更新时间";
-                                break;
-                            case "expires":
-                                obj.name = "域名过期时间";
-                                break;
-                            case "name":
-                                obj.name = "注册人名称";
-                                break;
-                            case "org":
-                                obj.name = "注册人组织";
-                                break;
-                            case "country":
-                                obj.name = "注册人国家";
-                                break;
-                            case "city":
-                                obj.name = "注册人城市";
-                                break;
-                            case "email":
-                                obj.name = "注册人邮箱";
-                                break;
-                            case "email":
-                                obj.name = "注册人邮箱";
-                                break;
-                            case "registrar_name":
-                                obj.name = "注册机构名称";
-                                break;
-                            case "registrar_email":
-                                obj.name = "注册机构邮箱";
-                                break;
-                            case "NS":
-                                obj.name = "域名服务器";
-                                break;
-                            case "NS_ips":
-                                obj.name = "域名服务器IP";
-                                break;
-                            case "MX":
-                                obj.name = "邮件服务器";
-                                break;
-                            case "MX_ips":
-                                obj.name = "邮件服务器IP";
-                                break;
-                            default:
-                                obj.name = k;
-                                break;
-                        }
+                      switch (k) {
+                        // Malicious URL whois
+                        // Phishing URL
+                        case "domain":
+                          obj.name = "域名";
+                          break;
+                        case "created":
+                          obj.name = "域名注册时间";
+                          break;
+                        case "updated":
+                          obj.name = "域名更新时间";
+                          break;
+                        case "expires":
+                          obj.name = "域名过期时间";
+                          break;
+                        case "name":
+                          obj.name = "注册人名称";
+                          break;
+                        case "org":
+                          obj.name = "注册人组织";
+                          break;
+                        case "country":
+                          obj.name = "注册人国家";
+                          break;
+                        case "city":
+                          obj.name = "注册人城市";
+                          break;
+                        case "email":
+                          obj.name = "注册人邮箱";
+                          break;
+                        case "email":
+                          obj.name = "注册人邮箱";
+                          break;
+                        case "registrar_name":
+                          obj.name = "注册机构名称";
+                          break;
+                        case "registrar_email":
+                          obj.name = "注册机构邮箱";
+                          break;
+                        case "NS":
+                          obj.name = "域名服务器";
+                          break;
+                        case "NS_ips":
+                          obj.name = "域名服务器IP";
+                          break;
+                        case "MX":
+                          obj.name = "邮件服务器";
+                          break;
+                        case "MX_ips":
+                          obj.name = "邮件服务器IP";
+                          break;
+                        default:
+                          obj.name = k;
+                          break;
+                      }
                     }
-                    obj.value = JSON.parse(this.$route.query.shopid).hoohoolab_ip_whois[k];
-                    this.whois_info.push(obj)
+                    obj.value = response.data.data.result.hoohoolab_ip_whois[k];
+                    this.whois_info.push(obj);
+                  }
                 }
+                this.res_detail = response.data.data.result;
+              }
             }
-            this.res_detail = JSON.parse(this.$route.query.shopid);
-        }
-    },
-    methods: {
-        handleClick(tab, event) {
-            console.log(tab, event);
-        },
-        detail_search_btn() {
-            if (this.detail_search == '') {
-            } else {
-                // this.$axios.get('https://47.105.196.251/site/reputation', {
-                this.$axios.get('/site/reputation', {
-                    params: {
-                        indicator: this.detail_search
-                        // indicator: '185.234.217.139'
-                    },
-                }
-                )
-                    .then(response => {
-                        this.whois_info = [];
-                        this.res_detail = {};
-                        if (response.data.status == "success") {
-                            if (response.data.data.result.hoohoolab_ip_whois) {
-                                for (var k in response.data.data.result.hoohoolab_ip_whois) {
-                                    var obj = {};
-                                    if (
-                                        response.data.data.result.sources[0].indexOf("IPReputation") != -1
-                                    ) {
-                                        switch (k) {
-                                            //   IP Reputation
-                                            case "net_range":
-                                                obj.name = "网络地址范围";
-                                                break;
-                                            case "net_name":
-                                                obj.name = "网络名称";
-                                                break;
-                                            case "descr":
-                                                obj.name = "网络描述";
-                                                break;
-                                            case "created":
-                                                obj.name = "网络注册时间";
-                                                break;
-                                            case "updated":
-                                                obj.name = "网络更新时间";
-                                                break;
-                                            case "country":
-                                                obj.name = "网络注册的国家";
-                                                break;
-                                            case "contact_owner_name":
-                                                obj.name = "网络所有者名称";
-                                                break;
-                                            case "contact_owner_code":
-                                                obj.name = "网络所有者编码";
-                                                break;
-                                            case "contact_owner_country":
-                                                obj.name = "网络所有者国家";
-                                                break;
-                                            case "contact_owner_country":
-                                                obj.name = "网络所有者国家";
-                                                break;
-                                            case "contact_owner_city":
-                                                obj.name = "网络所有者城市";
-                                                break;
-                                            case "contact_owner_email":
-                                                obj.name = "网络所有者邮箱";
-                                                break;
-                                            case "contact_abuse_name":
-                                                obj.name = "滥用报告接口人";
-                                                break;
-                                            case "contact_abuse_email":
-                                                obj.name = "滥用报告邮箱";
-                                                break;
-                                            case "asn":
-                                                obj.name = "自主系统号（ASN）";
-                                                break;
-                                            default:
-                                                obj.name = k;
-                                                break;
-                                        }
-                                    } else {
-                                        switch (k) {
-                                            // Malicious URL whois
-                                            // Phishing URL
-                                            case "domain":
-                                                obj.name = "域名";
-                                                break;
-                                            case "created":
-                                                obj.name = "域名注册时间";
-                                                break;
-                                            case "updated":
-                                                obj.name = "域名更新时间";
-                                                break;
-                                            case "expires":
-                                                obj.name = "域名过期时间";
-                                                break;
-                                            case "name":
-                                                obj.name = "注册人名称";
-                                                break;
-                                            case "org":
-                                                obj.name = "注册人组织";
-                                                break;
-                                            case "country":
-                                                obj.name = "注册人国家";
-                                                break;
-                                            case "city":
-                                                obj.name = "注册人城市";
-                                                break;
-                                            case "email":
-                                                obj.name = "注册人邮箱";
-                                                break;
-                                            case "email":
-                                                obj.name = "注册人邮箱";
-                                                break;
-                                            case "registrar_name":
-                                                obj.name = "注册机构名称";
-                                                break;
-                                            case "registrar_email":
-                                                obj.name = "注册机构邮箱";
-                                                break;
-                                            case "NS":
-                                                obj.name = "域名服务器";
-                                                break;
-                                            case "NS_ips":
-                                                obj.name = "域名服务器IP";
-                                                break;
-                                            case "MX":
-                                                obj.name = "邮件服务器";
-                                                break;
-                                            case "MX_ips":
-                                                obj.name = "邮件服务器IP";
-                                                break;
-                                            default:
-                                                obj.name = k;
-                                                break;
-                                        }
-                                    }
-                                    obj.value = response.data.data.result.hoohoolab_ip_whois[k];
-                                    this.whois_info.push(obj)
-                                }
-                            }
-                            this.res_detail = response.data.data.result
-                        }
-                    })
-                    .catch(error => {
-                        console.log(error);
-                    })
-            }
-        }
+          })
+          .catch(error => {
+            console.log(error);
+          });
+      }
     }
-}
+  }
+};
 </script>
 
 
