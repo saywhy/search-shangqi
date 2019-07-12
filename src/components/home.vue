@@ -33,6 +33,7 @@
         <div class="foot">
             <img src="../common/image/c.png" alt="">
             <span>2019 上海汽车集团股份有限公司</span>
+            <!-- <span>2019 上海工业控制安全创新科技有限公司</span> -->
         </div>
     </div>
 </template>
