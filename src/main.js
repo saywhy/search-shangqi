@@ -13,7 +13,7 @@ import "common/family/pingfang.css";*/
 import "swiper/dist/css/swiper.min.css";
 // import { dateFilter } from "common/js/dateFilter.js"; // 引入我们刚刚创建的文件
 // Vue.config.productionTip = false;
-//axios.defaults.baseURL = '/api/' // api 即上面 vue.config.js 中配置的地址
+// axios.defaults.baseURL = '/api/' // api 即上面 vue.config.js 中配置的地址
 
 // axios.defaults.headers.post["Content-Type"] = "application/json";
 Vue.use(ElementUI);
@@ -24,6 +24,8 @@ Vue.prototype.$axios = axios;
 new Vue({
   el: "#app",
   router,
-  components: { App },
+  components: {
+    App
+  },
   template: "<App/>",
 });

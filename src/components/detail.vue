@@ -1,120 +1,147 @@
 <template>
-    <div class="detail">
-        <div class="top">
-            <div class="top_left">
-                <img src="../common/image/logo.png" alt="">
-            </div>
-            <div class="top_right">
-                <input type="text" class="top_right_input" v-model="detail_search" placeholder="请输入IP、URL、域名、HASH">
-                <button class="top_right_button" @click="detail_search_btn">
-                    <img src="../common/image/search_icon.png" alt="">
-                </button>
-            </div>
-        </div>
-        <div class="content">
-            <p class="content_title">
-                <span>
-                    <router-link to='home'>
-                        <span style=" cursor: pointer;">
-                            情报查询
-                        </span>
-                    </router-link>
-                    > 威胁详情
-                </span>
-            </p>
-            <div class="mid">
-                <div class="mid_top">
-                    <div class="mid_top_left">
-                        <span class="mid_top_span">{{res_detail.indicator}}</span>
-                    </div>
-                    <button class="mid_top_btn" v-if="false">
-                        扩展查询
-                    </button>
-                </div>
-                <div class="mid_bom">
-                    <el-row class="mid_bom_content">
-                        <el-col :span="8">
-                            <p class="mid_bom_content_p">
-                                <img src="../common/image/local.png" alt="">
-                                <span class="mid_bom_content_title">地理位置：</span>
-                                <span :title="res_detail.geo">{{res_detail.geo}}</span>
-                            </p>
-                            <p class="mid_bom_content_p">
-                                <img src="../common/image/xin.png" alt="">
-                                <span class="mid_bom_content_title">置信度：</span>
-                                <span>{{res_detail.confidence}}</span>
-                            </p>
-                        </el-col>
-                        <el-col :span="8">
-                            <p class="mid_bom_content_p">
-                                <img src="../common/image/src.png" alt="">
-                                <span class="mid_bom_content_title">情报来源：</span>
-                                <span v-for="(item,index) in res_detail.sources" v-if="index==0">
-                                    <span>{{item}}</span>
-                                </span>
-                            </p>
-                            <p class="mid_bom_content_p">
-                                <img src="../common/image/f_time.png" alt="">
-                                <span class="mid_bom_content_title">首次发现时间：</span>
-                                <span>{{res_detail.hoohoolab_first_seen }}</span>
-                            </p>
-                        </el-col>
-                        <el-col :span="8">
-                            <p class="mid_bom_content_p">
-                                <img src="../common/image/local.png" alt="">
-                                <span class="mid_bom_content_title">威胁类型：</span>
-                                <span>{{res_detail.category }}</span>
-                            </p>
-                            <p class="mid_bom_content_p">
-                                <img src="../common/image/l_time.png" alt="">
-                                <span class="mid_bom_content_title">最近发现时间：</span>
-                                <span>{{res_detail.hoohoolab_last_seen }}</span>
-                            </p>
-                        </el-col>
-                    </el-row>
-                </div>
-            </div>
-            <div class="bottom_top_title">
-                <p>关联信息</p>
-            </div>
-            <div class="bottom">
-                <el-tabs v-model="activeName" @tab-click="handleClick">
-                    <el-tab-pane label="whois信息" name="first" class="first">
-                        <ul>
-                            <li class="tab_li" v-for="item in whois_info">
-                                <span class="whois_title">{{item.name}}</span>
-                                <span class="whois_value">{{item.value}}</span>
-                            </li>
-                        </ul>
-                    </el-tab-pane>
-                    <el-tab-pane label="关联样本" name="second" class="second">
-                        <table class="table table-hover ng-cloak">
-                            <tr style="font-size: 16px;color: #333;">
-                                <th style="font-weight: normal;">THREAT</th>
-                                <th style="font-weight: normal;">MD5</th>
-                                <th style="font-weight: normal;">SHA1</th>
-                                <th style="font-weight: normal;">SHA256</th>
-                            </tr>
-                            <tr v-for="item in res_detail.hoohoolab_files" style="font-size: 14px;color: #666666;">
-                                <td :title="item.threat">{{item.threat}}</td>
-                                <td :title="item.MD5">{{item.MD5}}</td>
-                                <td :title="item.SHA1">{{item.SHA1}}</td>
-                                <td :title="item.SHA256">{{item.SHA256}}</td>
-                            </tr>
-                        </table>
-                    </el-tab-pane>
-                    <el-tab-pane label="关联域名" name="third" class="third">
-                        <ul>
-                            <li class="tab_li">
-                                {{res_detail.hoohoolab_domains}}
-                            </li>
-                        </ul>
-                    </el-tab-pane>
-                </el-tabs>
-            </div>
-        </div>
-        <el-button :plain="true" @click="open4" v-if="false">错误</el-button>
+  <div class="detail"
+       v-loading.fullscreen.lock="loading">
+    <div class="top">
+      <div class="top_left">
+        <img src="../common/image/logo.png"
+             alt="">
+      </div>
+      <div class="top_right">
+        <input type="text"
+               class="top_right_input"
+               v-model="detail_search"
+               placeholder="请输入IP、URL、域名、HASH">
+        <button class="top_right_button"
+                @click="detail_search_btn">
+          <img src="../common/image/search_icon.png"
+               alt="">
+        </button>
+      </div>
     </div>
+    <div class="content">
+      <p class="content_title">
+        <span>
+          <router-link to='home'>
+            <span style=" cursor: pointer;">
+              情报查询
+            </span>
+          </router-link>
+          > 威胁详情
+        </span>
+      </p>
+      <div class="mid">
+        <div class="mid_top">
+          <div class="mid_top_left">
+            <span class="mid_top_span">{{res_detail.indicator}}</span>
+          </div>
+          <button class="mid_top_btn"
+                  @click="search_extension"
+                  v-if="true">
+            扩展查询
+          </button>
+        </div>
+        <div class="mid_bom">
+          <el-row class="mid_bom_content">
+            <el-col :span="8">
+              <p class="mid_bom_content_p">
+                <img src="../common/image/local.png"
+                     alt="">
+                <span class="mid_bom_content_title">地理位置：</span>
+                <span :title="res_detail.geo">{{res_detail.geo}}</span>
+              </p>
+              <p class="mid_bom_content_p">
+                <img src="../common/image/xin.png"
+                     alt="">
+                <span class="mid_bom_content_title">置信度：</span>
+                <span>{{res_detail.confidence}}</span>
+              </p>
+            </el-col>
+            <el-col :span="8">
+              <p class="mid_bom_content_p">
+                <img src="../common/image/src.png"
+                     alt="">
+                <span class="mid_bom_content_title">情报来源：</span>
+                <span v-for="(item,index) in res_detail.sources"
+                      v-if="index==0">
+                  <span>{{item}}</span>
+                </span>
+              </p>
+              <p class="mid_bom_content_p">
+                <img src="../common/image/f_time.png"
+                     alt="">
+                <span class="mid_bom_content_title">首次发现时间：</span>
+                <span>{{res_detail.hoohoolab_first_seen }}</span>
+              </p>
+            </el-col>
+            <el-col :span="8">
+              <p class="mid_bom_content_p">
+                <img src="../common/image/local.png"
+                     alt="">
+                <span class="mid_bom_content_title">威胁类型：</span>
+                <span>{{res_detail.category }}</span>
+              </p>
+              <p class="mid_bom_content_p">
+                <img src="../common/image/l_time.png"
+                     alt="">
+                <span class="mid_bom_content_title">最近发现时间：</span>
+                <span>{{res_detail.hoohoolab_last_seen }}</span>
+              </p>
+            </el-col>
+          </el-row>
+        </div>
+      </div>
+      <div class="bottom_top_title">
+        <p>关联信息</p>
+      </div>
+      <div class="bottom">
+        <el-tabs v-model="activeName"
+                 @tab-click="handleClick">
+          <el-tab-pane label="whois信息"
+                       name="first"
+                       class="first">
+            <ul>
+              <li class="tab_li"
+                  v-for="item in whois_info">
+                <span class="whois_title">{{item.name}}</span>
+                <span class="whois_value">{{item.value}}</span>
+              </li>
+            </ul>
+          </el-tab-pane>
+          <el-tab-pane label="关联样本"
+                       name="second"
+                       class="second">
+            <table class="table table-hover ng-cloak">
+              <tr style="font-size: 16px;color: #333;">
+                <th style="font-weight: normal;">THREAT</th>
+                <th style="font-weight: normal;">MD5</th>
+                <th style="font-weight: normal;">SHA1</th>
+                <th style="font-weight: normal;">SHA256</th>
+              </tr>
+              <tr v-for="item in res_detail.hoohoolab_files"
+                  style="font-size: 14px;color: #666666;">
+                <td :title="item.threat">{{item.threat}}</td>
+                <td :title="item.MD5">{{item.MD5}}</td>
+                <td :title="item.SHA1">{{item.SHA1}}</td>
+                <td :title="item.SHA256">{{item.SHA256}}</td>
+              </tr>
+            </table>
+          </el-tab-pane>
+          <el-tab-pane label="关联域名"
+                       name="third"
+                       class="third">
+            <ul>
+              <li class="tab_li">
+                {{res_detail.hoohoolab_domains}}
+              </li>
+            </ul>
+          </el-tab-pane>
+        </el-tabs>
+      </div>
+    </div>
+    <el-button :plain="true"
+               @click="open4"
+               v-if="false">错误</el-button>
+  </div>
 </template>
 <style  lang="less">
 .detail {
@@ -208,6 +235,8 @@
           }
         }
         .mid_top_btn {
+          cursor: pointer;
+          border: 0;
           background: #0070ff;
           font-size: 14px;
           right: 24px;
@@ -279,7 +308,7 @@
       }
       .tab_li,
       tr {
-        height: 48px;
+        // height: 48px;
         line-height: 48px;
         padding-left: 26px;
       }
@@ -313,21 +342,43 @@
     }
   }
 }
+.el-message-box__wrapper {
+  .el-message-box {
+    .el-message-box__btns {
+      .el-button--default {
+        &:hover {
+          background: #fff;
+          border: 1px solid #dcdfe6;
+          color: #606266;
+        }
+        &.el-button--primary {
+          background-color: #0070ff;
+          border-color: #0070ff;
+          color: #fff;
+          &:hover {
+            color: #fff;
+          }
+        }
+      }
+    }
+  }
+}
 </style>
 <script>
 export default {
   name: "detail",
-  data() {
+  data () {
     return {
       detail_search: "",
       activeName: "first",
       res_detail: {},
-      whois_info: []
+      whois_info: [],
+      loading: false
     };
   },
-  created() {
+  created () {
     var _this = this;
-    document.onkeydown = function(e) {
+    document.onkeydown = function (e) {
       // 兼容FF和IE和Opera
       var theEvent = e || window.event;
       var code = theEvent.keyCode || theEvent.which || theEvent.charCode;
@@ -337,7 +388,7 @@ export default {
       }
     };
   },
-  mounted() {
+  mounted () {
     console.log(JSON.parse(this.$route.query.shopid));
     if (this.$route.query.shopid) {
       if (JSON.parse(this.$route.query.shopid).hoohoolab_ip_whois) {
@@ -466,14 +517,14 @@ export default {
     }
   },
   methods: {
-    handleClick(tab, event) {
+    handleClick (tab, event) {
       console.log(tab, event);
       console.log(this.activeName);
     },
-    open4() {
+    open4 () {
       this.$message.error("没有搜索到信誉情报详情");
     },
-    detail_search_btn() {
+    detail_search_btn () {
       this.activeName = "first";
       if (this.detail_search == "") {
       } else {
@@ -490,7 +541,71 @@ export default {
             this.res_detail = {};
             if (response.data.status == "success") {
               if (response.data.data.result == null) {
-                this.open4();
+
+
+                this.$confirm('本地信誉库未查到该情报记录,可进行扩展查询', '', {
+                  distinguishCancelAndClose: true,
+                  confirmButtonText: '扩展查询',
+                  cancelButtonText: '取消'
+                })
+                  .then(() => {
+                    this.loading = true;
+                    this.$axios
+                      .get('/site/extension', {
+                        params: {
+                          indicator: this.detail_search
+                        }
+                      })
+                      .then((resp) => {
+                        this.loading = false;
+                        console.log('***')
+                        console.log(resp)
+
+                        let obj = this.detail_search
+
+                        if (resp.data.data == null) {
+                          this.$message.warning("没有查询到扩展信息");
+                          return false;
+                        }
+                        if (resp.data.data.result == null) {
+                          this.$message.warning("没有查询到扩展信息");
+                          return false;
+                        }
+
+                        for (var k in resp.data.data.result) {
+                          switch (k) {
+                            case "DomainGeneralInfo":
+                              //   window.location.href = "/ExtendedQuery.html#/domain?name=" + obj;
+                              sessionStorage.setItem("DomainGeneralInfo", JSON.stringify(resp.data.data));
+                              window.open("/ExtendedQuery.html#/domain?name=" + obj, "_blank");
+                              break;
+                            case "FileGeneralInfo":
+                              //   window.location.href = "/ExtendedQuery.html#/hash?name=" + obj;
+                              sessionStorage.setItem("FileGeneralInfo", JSON.stringify(resp.data.data));
+                              window.open("/ExtendedQuery.html#/hash?name=" + obj, "_blank");
+                              break;
+                            case "IpGeneralInfo":
+                              sessionStorage.setItem("IpGeneralInfo", JSON.stringify(resp.data.data));
+                              //   window.location.href = "/ExtendedQuery.html#/ip?name=" + obj;
+                              window.open("/ExtendedQuery.html#/ip?name=" + obj, "_blank");
+                              break;
+                            case "UrlGeneralInfo":
+                              sessionStorage.setItem("UrlGeneralInfo", JSON.stringify(resp.data.data));
+                              //   window.location.href = "/ExtendedQuery.html#/url?name=" + obj;
+                              window.open("/ExtendedQuery.html#/url?name=" + obj, "_blank");
+                              break;
+                            default:
+                              break;
+                          }
+                        }
+                      })
+                  })
+                  .catch(action => {
+                    this.$message({
+                      type: 'info',
+                      message: '取消扩展查询'
+                    })
+                  });
               } else {
                 if (response.data.data.result.hoohoolab_ip_whois) {
                   for (var k in response.data.data.result.hoohoolab_ip_whois) {
@@ -620,6 +735,59 @@ export default {
             console.log(error);
           });
       }
+    },
+    search_extension () {
+      // this.res_detail.indicator
+      this.loading = true;
+      this.$axios
+        .get('/site/extension', {
+          params: {
+            indicator: this.res_detail.indicator
+          }
+        })
+        .then((resp) => {
+          this.loading = false;
+          console.log('***')
+          console.log(resp)
+
+          let obj = this.res_detail.indicator;
+
+          if (resp.data.data == null) {
+            this.$message.warning("没有查询到扩展信息");
+            return false;
+          }
+          if (resp.data.data.result == null) {
+            this.$message.warning("没有查询到扩展信息");
+            return false;
+          }
+
+          for (var k in resp.data.data.result) {
+            switch (k) {
+              case "DomainGeneralInfo":
+                //   window.location.href = "/ExtendedQuery.html#/domain?name=" + obj;
+                sessionStorage.setItem("DomainGeneralInfo", JSON.stringify(resp.data.data));
+                window.open("/ExtendedQuery.html#/domain?name=" + obj, "_blank");
+                break;
+              case "FileGeneralInfo":
+                //   window.location.href = "/ExtendedQuery.html#/hash?name=" + obj;
+                sessionStorage.setItem("FileGeneralInfo", JSON.stringify(resp.data.data));
+                window.open("/ExtendedQuery.html#/hash?name=" + obj, "_blank");
+                break;
+              case "IpGeneralInfo":
+                sessionStorage.setItem("IpGeneralInfo", JSON.stringify(resp.data.data));
+                //   window.location.href = "/ExtendedQuery.html#/ip?name=" + obj;
+                window.open("/ExtendedQuery.html#/ip?name=" + obj, "_blank");
+                break;
+              case "UrlGeneralInfo":
+                sessionStorage.setItem("UrlGeneralInfo", JSON.stringify(resp.data.data));
+                //   window.location.href = "/ExtendedQuery.html#/url?name=" + obj;
+                window.open("/ExtendedQuery.html#/url?name=" + obj, "_blank");
+                break;
+              default:
+                break;
+            }
+          }
+        })
     }
   }
 };
