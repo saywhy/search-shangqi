@@ -4,8 +4,6 @@ node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-shangqi/
-SearchStatic/
 
 # Editor directories and files
 .idea
@@ -14,4 +12,3 @@ SearchStatic/
 *.ntvs*
 *.njsproj
 *.sln
-*.history

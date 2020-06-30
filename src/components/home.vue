@@ -1,5 +1,5 @@
 <template>
-    <div class="home">
+    <div class="home" v-loading.fullscreen.lock="loading" v-loading="btn_loading">
         <div class="log_box">
             <img src="../common/image/logo.png" class="logo" alt="">
         </div>
@@ -38,7 +38,7 @@
     </div>
 </template>
 <style  lang="less">
-.home {
+  .home {
   color: #000;
   height: 100%;
   min-height: 1080px;
@@ -153,13 +153,41 @@
     }
   }
 }
+
+  .el-button:focus, .el-button:hover {
+
+  }
+  .el-message-box__wrapper{
+    .el-message-box{
+      .el-message-box__btns{
+        .el-button--default{
+          &:hover{
+            background: #FFF;
+            border: 1px solid #DCDFE6;
+            color: #606266;
+          }
+          &.el-button--primary{
+            background-color: #0070ff;
+            border-color: #0070ff;
+            color: #fff;
+            &:hover{
+              color: #fff;
+            }
+          }
+        }
+
+      }
+    }
+  }
 </style>
-<script>
+<script type="text/ecmascript-6">
 import Swiper from "swiper";
 export default {
   name: "home",
   data() {
     return {
+      loading:false,
+      btn_loading:false,
       search: {
         indicator: ""
       },
@@ -183,10 +211,10 @@ export default {
   },
   methods: {
     get_new() {
-      this.$axios;
-      // .get("https://47.105.196.251:8443/site/safety-news")
-      this.$axios
-        .get("/site/safety-news")
+     // this.$axios
+     // .get("https://47.105.196.251:8443/site/safety-news")
+       this.$axios
+         .get("/site/safety-news")
         .then(response => {
           if (response.data.status == "success") {
             this.news_array = response.data.data;
@@ -209,7 +237,7 @@ export default {
           slidesPerView: 4,
           slidesPerGroup: 1,
           pagination: {
-            el: ".swiper-pagination",
+            el: '.swiper-pagination',
             clickable: true,
             dragSize: 30
             // type: 'progress',
@@ -225,15 +253,16 @@ export default {
       });
     },
     open4() {
-      this.$message.error("没有搜索到信誉情报详情");
+      this.$message.warning('没有搜索到信誉情报详情');
     },
     search_btn() {
-      if (this.search.indicator == "") {
+      if (this.search.indicator == '') {
       } else {
-        this.$axios;
-        //   .get("https://47.105.196.251/site/reputation", {
+      /*   this.$axios
+           .get("https://47.105.196.251/site/reputation", {*/
+        this.btn_loading = true;
         this.$axios
-          .get("/site/reputation", {
+          .get('/site/reputation', {
             params: {
               indicator: this.search.indicator
               // indicator: '185.234.217.139'
@@ -241,12 +270,77 @@ export default {
           })
           .then(response => {
             console.log(response);
+            this.btn_loading = false;
             if (response.data.status == "success") {
               if (response.data.data.result == null) {
-                this.open4();
+                //this.open4();
+
+                this.$confirm('本地信誉库未查到该情报记录,可进行扩展查询', '', {
+                  distinguishCancelAndClose: true,
+                  confirmButtonText: '扩展查询',
+                  cancelButtonText: '取消'
+                })
+                  .then(() => {
+                    this.loading = true;
+                    this.$axios
+                      .get('/site/extension', {
+                        params: {
+                          indicator: this.search.indicator
+                        }
+                      })
+                      .then((resp) => {
+                        this.loading = false;
+                        console.log('***')
+                        console.log(resp)
+
+                        let obj = this.search.indicator;
+
+                        if (resp.data.data == null) {
+                          this.$message.warning("没有查询到扩展信息");
+                          return false;
+                        }
+                        if (resp.data.data.result == null) {
+                          this.$message.warning("没有查询到扩展信息");
+                          return false;
+                        }
+
+                        for (var k in resp.data.data.result) {
+                          switch (k) {
+                            case "DomainGeneralInfo":
+                              //   window.location.href = "/ExtendedQuery.html#/domain?name=" + obj;
+                              sessionStorage.setItem("DomainGeneralInfo", JSON.stringify(resp.data.data));
+                              window.open("/ExtendedQuery.html#/domain?name=" + obj);
+                              break;
+                            case "FileGeneralInfo":
+                              //   window.location.href = "/ExtendedQuery.html#/hash?name=" + obj;
+                              sessionStorage.setItem("FileGeneralInfo", JSON.stringify(resp.data.data));
+                              window.open("/ExtendedQuery.html#/hash?name=" + obj);
+                              break;
+                            case "IpGeneralInfo":
+                              sessionStorage.setItem("IpGeneralInfo", JSON.stringify(resp.data.data));
+                              //   window.location.href = "/ExtendedQuery.html#/ip?name=" + obj;
+                              window.open("/ExtendedQuery.html#/ip?name=" + obj);
+                              break;
+                            case "UrlGeneralInfo":
+                              sessionStorage.setItem("UrlGeneralInfo", JSON.stringify(resp.data.data));
+                              //   window.location.href = "/ExtendedQuery.html#/url?name=" + obj;
+                              window.open("/ExtendedQuery.html#/url?name=" + obj);
+                              break;
+                            default:
+                              break;
+                          }
+                        }
+                      })
+                  })
+                  .catch(action => {
+                    this.$message({
+                      type: 'info',
+                      message: '取消扩展查询'
+                    })
+                  });
               } else {
                 this.$router.push({
-                  path: "/detail",
+                  path: '/detail',
                   query: { shopid: JSON.stringify(response.data.data.result) }
                 });
               }
@@ -260,5 +354,4 @@ export default {
   }
 };
 </script>
-
 

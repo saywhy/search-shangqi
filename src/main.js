@@ -8,12 +8,13 @@ import echarts from "echarts";
 // import china from "static/china.js";
 import ElementUI from "element-ui";
 import "element-ui/lib/theme-chalk/index.css";
-import "common/family/font.css";
-import "common/family/pingfang.css";
+/*import "common/family/font.css";
+import "common/family/pingfang.css";*/
 import "swiper/dist/css/swiper.min.css";
 // import { dateFilter } from "common/js/dateFilter.js"; // 引入我们刚刚创建的文件
-Vue.config.productionTip = false;
-// axios.defaults.baseURL = "/api";
+// Vue.config.productionTip = false;
+//axios.defaults.baseURL = '/api/' // api 即上面 vue.config.js 中配置的地址
+
 // axios.defaults.headers.post["Content-Type"] = "application/json";
 Vue.use(ElementUI);
 Vue.prototype.$echarts = echarts; //引入组件
