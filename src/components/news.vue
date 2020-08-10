@@ -1,18 +1,19 @@
 <template>
-    <div class="news">
-        <div class="top">
-            <div class="top_left">
-                <img src="../common/image/logo.png" alt="">
-            </div>
-        </div>
-        <div class="content">
-            <div class="title">
-                <p class="title_name">{{info_news.title}}</p>
-                <p class="title_time">{{info_news.updated_at*1000 | datefrm}}</p>
-                <p class="title_content">{{info_news.content}}</p>
-            </div>
-        </div>
+  <div class="news">
+    <div class="top">
+      <div class="top_left">
+        <img src="../common/image/logo.png"
+             alt="">
+      </div>
     </div>
+    <div class="content">
+      <div class="title">
+        <p class="title_name">{{info_news.title}}</p>
+        <p class="title_time">{{info_news.updated_at*1000 | datefrm}}</p>
+        <p class="title_content">{{info_news.content}}</p>
+      </div>
+    </div>
+  </div>
 </template>
 <style  lang="less">
 .news {
@@ -82,26 +83,26 @@
 <script>
 import moment from 'moment';
 export default {
-    name: 'news',
-    data() {
-        return {
-            info_news: {}
-        }
-    },
-    filters: {
-        datefrm: function (el) {
-            return moment(el).format('YYYY-MM-DD HH:mm:ss')
-        }
-    },
-    created() {
-    },
-    mounted() {
-        console.log(JSON.parse(this.$route.query.shopid));
-        this.info_news = JSON.parse(this.$route.query.shopid);
-    },
-    methods: {
-
+  name: 'news',
+  data () {
+    return {
+      info_news: {}
     }
+  },
+  filters: {
+    datefrm: function (el) {
+      return moment(el).format('YYYY-MM-DD HH:mm:ss')
+    }
+  },
+  created () {
+  },
+  mounted () {
+    console.log(JSON.parse(sessionStorage.getItem("news")));
+    this.info_news = JSON.parse(sessionStorage.getItem("news"))
+  },
+  methods: {
+
+  }
 }
 </script>
 

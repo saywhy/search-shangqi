@@ -1,44 +1,59 @@
 <template>
-    <div class="home" v-loading.fullscreen.lock="loading" v-loading="btn_loading">
-        <div class="log_box">
-            <img src="../common/image/logo.png" class="logo" alt="">
-        </div>
-        <div class="input_box">
-            <span class="tag">
-                信誉情报
-            </span>
-            <input type="text" v-model="search.indicator" placeholder="请输入IP、URL、域名、HASH" class="search_input">
-            <button class="input_btn" @click="search_btn">
-                <img src="../common/image/search_icon.png" alt="">
-            </button>
-        </div>
-        <div class="swiper_box">
-            <div class="swiper-container">
-                <div class="swiper-wrapper">
-                    <div class="swiper-slide" v-for="item in news_array" @click="silder_click(item)">
-                        <div class="swiper_img">
-                            <img :src="item.raw_picture" alt="">
-                        </div>
-                        <p class="swiper_p_tilte">
-                            {{item.title}}
-                        </p>
-                    </div>
-                </div>
-                <!-- 如果需要分页器 -->
-                <div class="swiper-pagination"></div>
-            </div>
-        </div>
-        <el-button :plain="true" @click="open4" v-if="false">错误</el-button>
-
-        <div class="foot">
-            <img src="../common/image/c.png" alt="">
-            <span>2019 上海汽车集团股份有限公司</span>
-            <!-- <span>2019 上海工业控制安全创新科技有限公司</span> -->
-        </div>
+  <div class="home"
+       v-loading.fullscreen.lock="loading"
+       v-loading="btn_loading">
+    <div class="log_box">
+      <img src="../common/image/logo.png"
+           class="logo"
+           alt="">
     </div>
+    <div class="input_box">
+      <span class="tag">
+        信誉情报
+      </span>
+      <input type="text"
+             v-model="search.indicator"
+             placeholder="请输入IP、URL、域名、HASH"
+             class="search_input">
+      <button class="input_btn"
+              @click="search_btn">
+        <img src="../common/image/search_icon.png"
+             alt="">
+      </button>
+    </div>
+    <div class="swiper_box">
+      <div class="swiper-container">
+        <div class="swiper-wrapper">
+          <div class="swiper-slide"
+               v-for="item in news_array"
+               @click="silder_click(item)">
+            <div class="swiper_img">
+              <img :src="item.raw_picture"
+                   alt="">
+            </div>
+            <p class="swiper_p_tilte">
+              {{item.title}}
+            </p>
+          </div>
+        </div>
+        <!-- 如果需要分页器 -->
+        <div class="swiper-pagination"></div>
+      </div>
+    </div>
+    <el-button :plain="true"
+               @click="open4"
+               v-if="false">错误</el-button>
+
+    <div class="foot">
+      <img src="../common/image/c.png"
+           alt="">
+      <span>2019 上海汽车集团股份有限公司</span>
+      <!-- <span>2019 上海工业控制安全创新科技有限公司</span> -->
+    </div>
+  </div>
 </template>
 <style  lang="less">
-  .home {
+.home {
   color: #000;
   height: 100%;
   min-height: 1080px;
@@ -154,49 +169,48 @@
   }
 }
 
-  .el-button:focus, .el-button:hover {
-
-  }
-  .el-message-box__wrapper{
-    .el-message-box{
-      .el-message-box__btns{
-        .el-button--default{
-          &:hover{
-            background: #FFF;
-            border: 1px solid #DCDFE6;
-            color: #606266;
-          }
-          &.el-button--primary{
-            background-color: #0070ff;
-            border-color: #0070ff;
+.el-button:focus,
+.el-button:hover {
+}
+.el-message-box__wrapper {
+  .el-message-box {
+    .el-message-box__btns {
+      .el-button--default {
+        &:hover {
+          background: #fff;
+          border: 1px solid #dcdfe6;
+          color: #606266;
+        }
+        &.el-button--primary {
+          background-color: #0070ff;
+          border-color: #0070ff;
+          color: #fff;
+          &:hover {
             color: #fff;
-            &:hover{
-              color: #fff;
-            }
           }
         }
-
       }
     }
   }
+}
 </style>
 <script type="text/ecmascript-6">
 import Swiper from "swiper";
 export default {
   name: "home",
-  data() {
+  data () {
     return {
-      loading:false,
-      btn_loading:false,
+      loading: false,
+      btn_loading: false,
       search: {
         indicator: ""
       },
       news_array: []
     };
   },
-  created() {
+  created () {
     var _this = this;
-    document.onkeydown = function(e) {
+    document.onkeydown = function (e) {
       // 兼容FF和IE和Opera
       var theEvent = e || window.event;
       var code = theEvent.keyCode || theEvent.which || theEvent.charCode;
@@ -206,15 +220,15 @@ export default {
       }
     };
   },
-  mounted() {
+  mounted () {
     this.get_new();
   },
   methods: {
-    get_new() {
-     // this.$axios
-     // .get("https://47.105.196.251:8443/site/safety-news")
-       this.$axios
-         .get("/site/safety-news")
+    get_new () {
+      // this.$axios
+      // .get("https://47.105.196.251:8443/site/safety-news")
+      this.$axios
+        .get("/site/safety-news")
         .then(response => {
           if (response.data.status == "success") {
             this.news_array = response.data.data;
@@ -225,7 +239,7 @@ export default {
           console.log(error);
         });
     },
-    initSwiper() {
+    initSwiper () {
       this.$nextTick(() => {
         var swiper = new Swiper(".swiper-container", {
           autoplay: {
@@ -245,21 +259,22 @@ export default {
         });
       });
     },
-    silder_click(item) {
+    silder_click (item) {
       console.log(item);
       this.$router.push({
         path: "/news",
-        query: { shopid: JSON.stringify(item) }
+        // query: { shopid: JSON.stringify(item) }
       });
+      sessionStorage.setItem("news", JSON.stringify(item));
     },
-    open4() {
+    open4 () {
       this.$message.warning('没有搜索到信誉情报详情');
     },
-    search_btn() {
+    search_btn () {
       if (this.search.indicator == '') {
       } else {
-      /*   this.$axios
-           .get("https://47.105.196.251/site/reputation", {*/
+        /*   this.$axios
+             .get("https://47.105.196.251/site/reputation", {*/
         this.btn_loading = true;
         this.$axios
           .get('/site/reputation', {
@@ -341,8 +356,9 @@ export default {
               } else {
                 this.$router.push({
                   path: '/detail',
-                  query: { shopid: JSON.stringify(response.data.data.result) }
+                  // query: { shopid: JSON.stringify(response.data.data.result) }
                 });
+                sessionStorage.setItem("detail", JSON.stringify(response.data.data.result));
               }
             }
           })

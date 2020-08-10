@@ -389,13 +389,13 @@ export default {
     };
   },
   mounted () {
-    console.log(JSON.parse(this.$route.query.shopid));
-    if (this.$route.query.shopid) {
-      if (JSON.parse(this.$route.query.shopid).hoohoolab_ip_whois) {
-        for (var k in JSON.parse(this.$route.query.shopid).hoohoolab_ip_whois) {
+    console.log(JSON.parse(sessionStorage.getItem("detail")));
+    if (sessionStorage.getItem("detail")) {
+      if (JSON.parse(sessionStorage.getItem("detail")).hoohoolab_ip_whois) {
+        for (var k in JSON.parse(sessionStorage.getItem("detail")).hoohoolab_ip_whois) {
           var obj = {};
           if (
-            JSON.parse(this.$route.query.shopid).sources[0].indexOf(
+            JSON.parse(sessionStorage.getItem("detail")).sources[0].indexOf(
               "IPReputation"
             ) != -1
           ) {
@@ -507,13 +507,13 @@ export default {
                 break;
             }
           }
-          obj.value = JSON.parse(this.$route.query.shopid).hoohoolab_ip_whois[
+          obj.value = JSON.parse(sessionStorage.getItem("detail")).hoohoolab_ip_whois[
             k
           ];
           this.whois_info.push(obj);
         }
       }
-      this.res_detail = JSON.parse(this.$route.query.shopid);
+      this.res_detail = JSON.parse(sessionStorage.getItem("detail"));
     }
   },
   methods: {
@@ -747,11 +747,8 @@ export default {
         })
         .then((resp) => {
           this.loading = false;
-          console.log('***')
           console.log(resp)
-
           let obj = this.res_detail.indicator;
-
           if (resp.data.data == null) {
             this.$message.warning("没有查询到扩展信息");
             return false;
@@ -760,27 +757,22 @@ export default {
             this.$message.warning("没有查询到扩展信息");
             return false;
           }
-
           for (var k in resp.data.data.result) {
             switch (k) {
               case "DomainGeneralInfo":
-                //   window.location.href = "/ExtendedQuery.html#/domain?name=" + obj;
                 sessionStorage.setItem("DomainGeneralInfo", JSON.stringify(resp.data.data));
                 window.open("/ExtendedQuery.html#/domain?name=" + obj, "_blank");
                 break;
               case "FileGeneralInfo":
-                //   window.location.href = "/ExtendedQuery.html#/hash?name=" + obj;
                 sessionStorage.setItem("FileGeneralInfo", JSON.stringify(resp.data.data));
                 window.open("/ExtendedQuery.html#/hash?name=" + obj, "_blank");
                 break;
               case "IpGeneralInfo":
                 sessionStorage.setItem("IpGeneralInfo", JSON.stringify(resp.data.data));
-                //   window.location.href = "/ExtendedQuery.html#/ip?name=" + obj;
                 window.open("/ExtendedQuery.html#/ip?name=" + obj, "_blank");
                 break;
               case "UrlGeneralInfo":
                 sessionStorage.setItem("UrlGeneralInfo", JSON.stringify(resp.data.data));
-                //   window.location.href = "/ExtendedQuery.html#/url?name=" + obj;
                 window.open("/ExtendedQuery.html#/url?name=" + obj, "_blank");
                 break;
               default:
